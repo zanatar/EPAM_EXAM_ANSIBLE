@@ -1,0 +1,87 @@
+- name: Install snmpd & play 2048
+  hosts: all
+  become: true
+  # become_user: root
+  vars:
+    - servs:
+        - {name: web1, port: "8081:5000", host: test1.localdomain} 
+        - {name: web2, port: "8082:5000", host: test2.localdomain} 
+        - {name: web3, port: "8083:5000", host: test3.localdomain} 
+  # vars:
+    # sshgroup_name: sshusers
+    # user:
+      # login: deploy
+      # password_hash:
+        # "$6$NwI7op8FHR1VQta6$zuQXHtNtM/7SRQsf1./18WbBrHMq4mT88nWh67ThmlWcqyVX3F\
+        # BTY9uj/07tR9ViDEvjg6/bh0y3mSjeDQYe3."
+      # authorized_key:
+        # "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr\
+        # +kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6I\
+        # edplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2\
+        # hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZE\
+        # nDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHln\
+        # VYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
+  tasks: 
+    - name: Install epel
+      yum:
+        name: epel-release
+        state: present
+        enablerepo: extras
+    - name: Install yum-utils
+      yum:
+        name: yum-utils
+        state: present
+    - name: Add docker repository
+      ansible.builtin.shell: sudo yum-config-manager \
+            --add-repo \
+            https://download.docker.com/linux/centos/docker-ce.repo
+        
+      # ansible.builtin.shell:  curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    - name: Install pip & docker
+      package:
+        name:
+          - python-pip
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+    - name: Install docker SDK via pip
+      pip:
+        name: 
+          - docker
+    - name: Start docker
+      systemd:
+        name: docker
+        enabled: true
+        state: started
+    - name: Create a network
+      community.docker.docker_network:
+        name: epam_exam
+    - name: Create a webserver container
+      community.docker.docker_container:
+        name: "{{item.name}}"
+        image: zanatar/webserver
+        ports: "{{item.port}}"
+        hostname: "{{item.host}}"
+        auto_remove: yes
+        networks:
+        - name: epam_exam
+      loop: "{{servs}}"
+    - name: Creates nginx_conf directory
+      file:
+        path: ./nginx_conf
+        state: directory
+    - name: create nginx conf from jinja2
+      template:
+        src: test.j2
+        dest: ./nginx_conf/default.conf
+    - name: Create Nginx container
+      community.docker.docker_container:
+        name: nginx
+        image: nginx
+        ports: "8080:80"
+        auto_remove: yes
+        networks:
+        - name: epam_exam
+        volumes:
+          - ./nginx_conf:/etc/nginx/conf.d

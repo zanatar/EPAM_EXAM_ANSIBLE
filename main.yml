@@ -1,0 +1,15 @@
+---
+
+- name: provision server
+  hosts: all
+  become: true
+  vars:
+    - servs:
+        - {name: web1, port: "8081:5000", host: test1.localdomain} 
+        - {name: web2, port: "8082:5000", host: test2.localdomain} 
+        - {name: web3, port: "8083:5000", host: test3.localdomain} 
+    - docker_network: epam_exam
+  roles:
+ #   - role: centos_docker_install
+    - centos_webserver_install
+    - centos_nginx_proxy_install

@@ -1,0 +1,34 @@
+---
+- name: Install epel
+  yum:
+    name: epel-release
+    state: present
+    enablerepo: extras
+- name: Install yum-utils
+  yum:
+    name: yum-utils
+    state: present
+- name: Add docker repository
+  ansible.builtin.shell: sudo yum-config-manager \
+        --add-repo \
+        https://download.docker.com/linux/centos/docker-ce.repo
+- name: Install pip & docker
+  package:
+    name:
+      - python-pip
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+- name: Install docker SDK via pip
+  pip:
+    name: 
+      - docker
+- name: Start docker
+  systemd:
+    name: docker
+    enabled: true
+    state: started
+- name: Create a network
+  community.docker.docker_network:
+    name: "{{docker_network}}"

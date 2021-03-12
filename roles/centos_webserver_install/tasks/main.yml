@@ -1,0 +1,14 @@
+---
+- name: include docker install role
+  include_role:
+    name: centos_docker_install
+- name: Create a webserver container
+  community.docker.docker_container:
+    name: "{{item.name}}"
+    image: zanatar/webserver
+    ports: "{{item.port}}"
+    hostname: "{{item.host}}"
+    auto_remove: yes
+    networks:
+    - name: "{{docker_network}}"
+  loop: "{{servs}}"

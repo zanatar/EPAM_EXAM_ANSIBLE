@@ -1,0 +1,22 @@
+---
+- name: include docker install role
+  include_role:
+    name: centos_docker_install
+- name: Creates nginx_conf directory
+  file:
+    path: ./nginx_conf
+    state: directory
+- name: create nginx conf from jinja2
+  template:
+    src: nginx_conf.j2
+    dest: ./nginx_conf/default.conf
+- name: Create Nginx container
+  community.docker.docker_container:
+    name: nginx
+    image: nginx
+    ports: "8080:80"
+    auto_remove: yes
+    networks:
+    - name: "{{docker_network}}"
+    volumes:
+      - ./nginx_conf:/etc/nginx/conf.d
