@@ -4,7 +4,6 @@
   hosts: all
   become_user: exam
   vars:
-    - ansible_user=
     - servs:
         - {name: web1, port: "8081:5000", host: test1.localdomain} 
         - {name: web2, port: "8082:5000", host: test2.localdomain} 
