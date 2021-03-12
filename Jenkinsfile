@@ -13,7 +13,7 @@ pipeline {
             }
 		stage('test') {
 			steps {
-				sh ([script: 'while read HOST; do curl $HOST:8080; done < inventory.txt'])
+				sh ([script: "while read HOST; do curl $HOST:8080; done < inventory.txt"])
 			}
 		}
 	}
