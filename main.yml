@@ -3,6 +3,7 @@
 - name: provision server
   hosts: all
   become: true
+  become_user: exam
   vars:
     - servs:
         - {name: web1, port: "8081:5000", host: test1.localdomain} 
