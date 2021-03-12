@@ -14,7 +14,7 @@ pipeline {
 		stage('test') {
 			steps {
 				 sh '''#!/bin/bash
-				 while read HOST; do curl $HOST:8080; done < inventory.txt
+				 while read HOST; do echo $(curl $HOST:8080); done < inventory.txt
 				 '''
 			}
 		}
