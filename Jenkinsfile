@@ -14,7 +14,7 @@ pipeline {
 		stage('test') {
 			steps {
 				script {
-					new File('inventory.txt').eachLine { line ->
+					new File('./inventory.txt').eachLine { line ->
 						println line
 					}
 				}
