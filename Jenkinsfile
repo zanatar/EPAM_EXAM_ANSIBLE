@@ -15,7 +15,7 @@ pipeline {
 					def file = readFile('inventory.txt')
 					def lines = file.readLines()
 					for (item in lines) {
-						curl "${item}":8080
+						sh 'curl "${item}":8080'
 					}
 				}
 			}
