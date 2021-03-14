@@ -1,5 +1,6 @@
 node {
     stage('deploy') {
+		checkout scm
 		ansiblePlaybook( 
 		playbook: 'main.yml',
 		inventory: 'inventory.txt' 
