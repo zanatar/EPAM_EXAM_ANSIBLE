@@ -10,10 +10,14 @@ pipeline {
 				}
             }
 		stage('test') {
-				def file = readFile('inventory.txt')
-				def lines = file.readLines()
-				for (item in lines) {
-					curl "${item}":8080
+			steps {
+				script {
+					def file = readFile('inventory.txt')
+					def lines = file.readLines()
+					for (item in lines) {
+						curl "${item}":8080
+					}
+				}
 			}
 		}
 	}
