@@ -10,7 +10,6 @@ node {
 		def file = readFile('inventory.txt')
 		def lines = file.readLines()
 		for (item in lines) {
-			echo "${item}"
 			def uri = 'http://'+"${item}"+':8080'
 			def response = httpRequest "${uri}"
 			println("Status: "+response.status)
