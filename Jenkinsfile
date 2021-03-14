@@ -11,7 +11,8 @@ node {
 		def lines = file.readLines()
 		for (item in lines) {
 			echo "${item}"
-			def response = httpRequest http://"${item}":8080
+			def uri = http://"${item}":8080
+			def response = httpRequest "${uri}"
 			println("Status: "+response.status)
 			println("Content: "+response.content)
 		}
