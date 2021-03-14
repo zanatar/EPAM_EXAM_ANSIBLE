@@ -9,7 +9,9 @@ node {
 		def file = readFile('inventory.txt')
 		def lines = file.readLines()
 		for (item in lines) {
-			curl "${item}":8080
+			def response = httpRequest 'http://"{item}":8080
+			println("Status: "+response.status)
+			println("Content: "+response.content)
 		}
 	}
 }
