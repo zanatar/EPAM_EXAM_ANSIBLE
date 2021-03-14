@@ -3,24 +3,19 @@ pipeline {
     stages {
         stage('deploy') {
             steps {
-//			sh "ansible-playbook -i inventory.txt main.yml"
 				ansiblePlaybook( 
 					playbook: 'main.yml',
-					inventory: 'inventory.txt', 
-//				credentialsId: 'sample-ssh-key', 
+					inventory: 'inventory.txt' 
 					)
 				}
             }
 		stage('test') {
 			steps {
-				script {
-					new File('./inventory.txt').eachLine { line ->
-						println line
-					}
+				def file = readFile('inventory.txt')
+				def lines = file.readLines()
+				for (item in lines) {
+					curl "${item}":8080
 				}
-//				 sh '''#!/bin/bash
-//				 while read HOST; do echo $(curl $HOST:8080); done < inventory.txt
-//				 '''
 			}
 		}
 	}
